@@ -9,8 +9,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-
-	"golang.org/x/crypto/openpgp/armor"
 )
 
 var key []byte
@@ -87,11 +85,7 @@ func encrypt() {
 	}
 	defer outFile.Close()
 
-	//encoder := base64.NewEncoder(base64.StdEncoding, outFile)
-	encoder, err := armor.Encode(outFile, "SSH-RSA-CRYPT", headers)
-	if err != nil {
-		panic(err)
-	}
+	encoder := base64.NewEncoder(base64.StdEncoding, outFile)
 	defer encoder.Close()
 	writer := &cipher.StreamWriter{S: stream, W: encoder}
 	// Copy the input file to the output file, encrypting as we go.
@@ -115,6 +109,9 @@ func main() {
 	if privKey.N.Cmp(pubKey.N) == 0 {
 		fmt.Println("Public Key and Private Key match")
 	}
+
+	gpgEncrypt(pubKey)
+	gpgDecrypt(privKey)
 
 	inFile, err := os.Open("decrypted-file")
 	if err != nil {
