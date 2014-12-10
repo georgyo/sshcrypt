@@ -2,6 +2,7 @@ package main
 
 import (
 	"crypto"
+	"crypto/rand"
 	"crypto/rsa"
 	"io"
 	"os"
@@ -15,6 +16,9 @@ import (
 
 func gpgEncrypt(rsaPubKey *rsa.PublicKey) {
 
+	aesKey := make([]byte, packet.CipherAES256.KeySize())
+	rand.Read(aesKey)
+
 	pubKey := packet.NewRSAPublicKey(time.Now(), rsaPubKey)
 	config := &packet.Config{
 		DefaultHash:   crypto.SHA3_512,
@@ -27,7 +31,7 @@ func gpgEncrypt(rsaPubKey *rsa.PublicKey) {
 	}
 	defer inFile.Close()
 
-	outFile, err := os.OpenFile("encrypted-file2", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	outFile, err := os.OpenFile("encrypted-file", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		panic(err)
 	}
@@ -39,12 +43,12 @@ func gpgEncrypt(rsaPubKey *rsa.PublicKey) {
 	}
 	defer outArmor.Close()
 
-	err = packet.SerializeEncryptedKey(outArmor, pubKey, packet.CipherAES256, key, config)
+	err = packet.SerializeEncryptedKey(outArmor, pubKey, packet.CipherAES256, aesKey, config)
 	if err != nil {
 		panic(err)
 	}
 
-	encryptedData, err := packet.SerializeSymmetricallyEncrypted(outArmor, packet.CipherAES256, key, config)
+	encryptedData, err := packet.SerializeSymmetricallyEncrypted(outArmor, packet.CipherAES256, aesKey, config)
 	if err != nil {
 		panic(err)
 	}
@@ -84,13 +88,13 @@ func gpgDecrypt(rsaPrivKey *rsa.PrivateKey) {
 		DefaultCipher: packet.CipherAES256,
 	}
 
-	inFile, err := os.Open("encrypted-file2")
+	inFile, err := os.Open("encrypted-file")
 	if err != nil {
 		panic(err)
 	}
 	defer inFile.Close()
 
-	outFile, err := os.OpenFile("decrypted-file2", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+	outFile, err := os.OpenFile("decrypted-file", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
 		panic(err)
 	}
@@ -107,7 +111,7 @@ func gpgDecrypt(rsaPrivKey *rsa.PrivateKey) {
 		PrimaryKey: packet.NewRSAPublicKey(time.Now(), rsaPrivKey.Public().(*rsa.PublicKey)),
 	})
 
-	md, err := openpgp.ReadMessage(armorBlock.Body, keyRing, prompter, config)
+	md, err := openpgp.ReadMessage(armorBlock.Body, keyRing, nil, config)
 	if err != nil {
 		panic(err)
 	}
