@@ -1,0 +1,25 @@
+Everything is currently hardcoded, this will not work for you.
+
+Some facts
+ 1. PGP is hard, or at least people think it is.
+ 2. The trust model actually is hard, and so people just ignore it completely.
+ 3. Not many people use PGP.
+ 4. Many people actively use ssh keys
+  1. These keys are almost always RSA keys, which is also the most common PGP key type.
+
+Given these facts, wouldn't it be cool if you could encrypt a file with someone's public key?
+
+Other facts.
+ 1. Not an original idea, AWS does this for storing windows password.
+  1. Not the inspiration for this project
+ 2. We actually use the PGP file format.
+
+
+Planned Features
+ 1. CLI arguments!
+ 2. Encrypt to ALL RSA keys in an authorizedKeys file
+ 3. Encrypt to ALL RSA keys in an user's github account
+ 4. Releases
+
+
+Everything is currently hardcoded, this will not work for you.
