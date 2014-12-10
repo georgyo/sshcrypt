@@ -14,12 +14,15 @@ import (
 	_ "golang.org/x/crypto/sha3"
 )
 
+//A fake static time for when keys are (were) created
+var KeyDate time.Time = time.Date(1979, time.April, 10, 14, 15, 0, 0, time.FixedZone("VET", -16200))
+
 func gpgEncrypt(rsaPubKey *rsa.PublicKey) {
 
 	aesKey := make([]byte, packet.CipherAES256.KeySize())
 	rand.Read(aesKey)
 
-	pubKey := packet.NewRSAPublicKey(time.Now(), rsaPubKey)
+	pubKey := packet.NewRSAPublicKey(KeyDate, rsaPubKey)
 	config := &packet.Config{
 		DefaultHash:   crypto.SHA3_512,
 		DefaultCipher: packet.CipherAES256,
@@ -82,7 +85,7 @@ func prompter(keys []openpgp.Key, symmetric bool) (passphrase []byte, err error)
 
 func gpgDecrypt(rsaPrivKey *rsa.PrivateKey) {
 
-	privKey := packet.NewRSAPrivateKey(time.Now(), rsaPrivKey)
+	privKey := packet.NewRSAPrivateKey(KeyDate, rsaPrivKey)
 	config := &packet.Config{
 		DefaultHash:   crypto.SHA3_512,
 		DefaultCipher: packet.CipherAES256,
@@ -108,7 +111,7 @@ func gpgDecrypt(rsaPrivKey *rsa.PrivateKey) {
 	var keyRing openpgp.EntityList
 	keyRing = append(keyRing, &openpgp.Entity{
 		PrivateKey: privKey,
-		PrimaryKey: packet.NewRSAPublicKey(time.Now(), rsaPrivKey.Public().(*rsa.PublicKey)),
+		PrimaryKey: packet.NewRSAPublicKey(KeyDate, rsaPrivKey.Public().(*rsa.PublicKey)),
 	})
 
 	md, err := openpgp.ReadMessage(armorBlock.Body, keyRing, nil, config)
