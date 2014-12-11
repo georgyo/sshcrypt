@@ -21,8 +21,10 @@ import (
 var KeyDate time.Time = time.Date(1979, time.April, 10, 14, 15, 0, 0, time.FixedZone("VET", -16200))
 
 var config = &packet.Config{
-	DefaultHash:   crypto.SHA3_512,
-	DefaultCipher: packet.CipherAES256,
+	DefaultHash:            crypto.SHA3_512,
+	DefaultCipher:          packet.CipherAES256,
+	DefaultCompressionAlgo: packet.CompressionZLIB,
+	CompressionConfig:      &packet.CompressionConfig{Level: 7},
 }
 
 func prompter(keys []openpgp.Key, symmetric bool) (passphrase []byte, err error) {
@@ -58,7 +60,14 @@ func gpgEncrypt(rsaPubKey *rsa.PublicKey, inFile io.Reader, outFile io.Writer) {
 	if !hints.ModTime.IsZero() {
 		epochSeconds = uint32(hints.ModTime.Unix())
 	}
-	writer, err := packet.SerializeLiteral(encryptedData, hints.IsBinary, hints.FileName, epochSeconds)
+
+	compressedData, err := packet.SerializeCompressed(encryptedData, config.DefaultCompressionAlgo, config.CompressionConfig)
+	if err != nil {
+		panic(err)
+	}
+	defer compressedData.Close()
+
+	writer, err := packet.SerializeLiteral(compressedData, hints.IsBinary, hints.FileName, epochSeconds)
 	if err != nil {
 		panic(err)
 	}
