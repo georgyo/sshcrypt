@@ -32,12 +32,10 @@ func prompter(keys []openpgp.Key, symmetric bool) (passphrase []byte, err error)
 	return
 }
 
-func gpgEncrypt(rsaPubKey *rsa.PublicKey, inFile io.Reader, outFile io.Writer) {
+func gpgEncrypt(rsaPubKeys []*rsa.PublicKey, inFile io.Reader, outFile io.Writer) {
 
 	aesKey := make([]byte, packet.CipherAES256.KeySize())
 	rand.Read(aesKey)
-
-	pubKey := packet.NewRSAPublicKey(KeyDate, rsaPubKey)
 
 	outArmor, err := armor.Encode(outFile, "SSH-CRYPT-MESSAGE", make(map[string]string))
 	if err != nil {
@@ -45,9 +43,17 @@ func gpgEncrypt(rsaPubKey *rsa.PublicKey, inFile io.Reader, outFile io.Writer) {
 	}
 	defer outArmor.Close()
 
-	err = packet.SerializeEncryptedKey(outArmor, pubKey, packet.CipherAES256, aesKey, config)
-	if err != nil {
-		panic(err)
+	if len(rsaPubKeys) == 0 {
+		panic("No keys to use")
+	}
+
+	for _, rsaPubKey := range rsaPubKeys {
+		pubKey := packet.NewRSAPublicKey(KeyDate, rsaPubKey)
+
+		err = packet.SerializeEncryptedKey(outArmor, pubKey, packet.CipherAES256, aesKey, config)
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	encryptedData, err := packet.SerializeSymmetricallyEncrypted(outArmor, packet.CipherAES256, aesKey, config)

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/rsa"
 	"crypto/x509"
@@ -198,29 +199,29 @@ func ParsePrivateKey(pemBytes []byte) (key *rsa.PrivateKey, err error) {
 	}
 }
 
-func openPubKey(path string) (out *rsa.PublicKey, err error) {
+func openPubKey(path string) (out []*rsa.PublicKey, err error) {
 	file, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
 	defer file.Close()
 
-	fileInfo, err := file.Stat()
-	if err != nil {
-		panic(err)
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text()) // Println will add back the final '\n'
+		key, _, _, _, err := ParseAuthorizedKey(scanner.Bytes())
+		if err != nil {
+			fmt.Printf("Could not read key")
+			continue
+		}
+		out = append(out, key)
+
 	}
-	buf := make([]byte, fileInfo.Size())
-	_, err = file.Read(buf)
-	if err != nil {
-		panic(err)
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintln(os.Stderr, "reading standard input:", err)
 	}
 
-	key, _, _, _, err := ParseAuthorizedKey(buf)
-	if err != nil {
-		panic(err)
-	}
-
-	return key, err
+	return out, err
 
 }
 
