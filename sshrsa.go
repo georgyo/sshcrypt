@@ -208,7 +208,6 @@ func openPubKey(path string) (out []*rsa.PublicKey, err error) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		fmt.Println(scanner.Text()) // Println will add back the final '\n'
 		key, _, _, _, err := ParseAuthorizedKey(scanner.Bytes())
 		if err != nil {
 			fmt.Printf("Could not read key")
