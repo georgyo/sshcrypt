@@ -11,17 +11,18 @@ import (
 	"io"
 	"time"
 
+	_ "crypto/sha256"
+
 	"golang.org/x/crypto/openpgp"
 	"golang.org/x/crypto/openpgp/armor"
 	"golang.org/x/crypto/openpgp/packet"
-	_ "golang.org/x/crypto/sha3"
 )
 
 //A fake static time for when key's are (were) created
 var KeyDate time.Time = time.Date(1979, time.April, 10, 14, 15, 0, 0, time.FixedZone("VET", -16200))
 
 var config = &packet.Config{
-	DefaultHash:            crypto.SHA3_512,
+	DefaultHash:            crypto.SHA256,
 	DefaultCipher:          packet.CipherAES256,
 	DefaultCompressionAlgo: packet.CompressionZLIB,
 	CompressionConfig:      &packet.CompressionConfig{Level: 7},
