@@ -6,7 +6,7 @@ go:
  - tip
 
 before_install:
- - sed -i "s|git://github.com/totallylegitbiz/sshcrypt.git|https://github.com/totallylegitbiz/sshcrypt|g"
+ - sed -i "s|git://github.com/totallylegitbiz/sshcrypt.git|https://github.com/totallylegitbiz/sshcrypt|g" .git/config
 
 install:
  - go get -u

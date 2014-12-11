@@ -1,4 +1,4 @@
-
+[![Build Status](https://drone.io/github.com/totallylegitbiz/sshcrypt/status.png)](https://drone.io/github.com/totallylegitbiz/sshcrypt/latest)
 ## SSHCRYPT
 
 Encrypt and Decrypt files using only SSH RSA Keys!
