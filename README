@@ -29,5 +29,15 @@ Note.
 
 
 INSTALL AND TEST
-go get -u github.com/totallylegitbiz/sshcrypt
-echo hello | sshcrypt | sshcrypt -d
+
+$ go get -u github.com/totallylegitbiz/sshcrypt
+$ sshcrypt --help
+Usage of ./sshcrypt:
+  -d=false: Decrypt file instead of encrypting
+  -in="-": Input file
+  -out="-": Output file
+  -privKey="~/.ssh/id_rsa": Private Key file (Decrypting)
+  -pubKey="~/.ssh/id_rsa.pub": Public Key file (Encrypting)
+
+$ echo hello | sshcrypt | sshcrypt -d
+hello
