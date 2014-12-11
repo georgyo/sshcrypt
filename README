@@ -26,3 +26,8 @@ Planned Features
 Note.
  - Can only encrypt to one key at a time
  - Does not yet supported password protected private keys
+
+
+INSTALL AND TEST
+go get -u github.com/totallylegitbiz/sshcrypt
+echo hello | sshcrypt | sshcrypt -d
