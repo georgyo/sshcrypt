@@ -1,34 +1,65 @@
 package main
 
 import (
-	"bufio"
-	"fmt"
+	"flag"
 	"os"
+	"path"
 )
 
+var inFilePath string
+var outFilePath string
+var pubKeyPath string
+var privKeyPath string
+var doDecrypt bool
+
+func init() {
+	flag.StringVar(&inFilePath, "in", "-", "Input file")
+	flag.StringVar(&outFilePath, "out", "-", "Output file")
+	flag.StringVar(&pubKeyPath, "pubKey", path.Join(os.Getenv("HOME"), ".ssh/id_rsa.pub"), "Public Key file (Encrypting)")
+	flag.StringVar(&privKeyPath, "privKey", path.Join(os.Getenv("HOME"), ".ssh/id_rsa"), "Private Key file (Decrypting)")
+	flag.BoolVar(&doDecrypt, "d", false, "Decrypt file instead of encrypting")
+}
+
 func main() {
-	pubKey, err := openPubKey()
-	privKey, err := openPrivKey()
 
-	if privKey.N.Cmp(pubKey.N) == 0 {
-		fmt.Println("Public Key and Private Key match")
-	}
+	flag.Parse()
+	var err error
 
-	//Reads plaintext-file and writes encrypted-file
-	gpgEncrypt(pubKey)
-
-	//Reads encrypted-file and writes decrypted-file
-	gpgDecrypt(privKey)
-
-	// Output the decrypted file
-	inFile, err := os.Open("decrypted-file")
-	if err != nil {
-		panic(err)
+	var inFile *os.File
+	if inFilePath == "-" {
+		inFile = os.Stdin
+	} else {
+		inFile, err = os.Open(inFilePath)
+		if err != nil {
+			panic(err)
+		}
 	}
 	defer inFile.Close()
 
-	buf := bufio.NewReader(inFile)
-	out, err := buf.ReadString(byte(0))
-	fmt.Print(out)
+	var outFile *os.File
+	if outFilePath == "-" {
+		outFile = os.Stdout
+	} else {
+		outFile, err = os.OpenFile("encrypted-file", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
+		if err != nil {
+			panic(err)
+		}
+	}
+	defer outFile.Close()
+
+	if doDecrypt {
+		privKey, err := openPrivKey()
+		if err != nil {
+			panic(err)
+		}
+		gpgDecrypt(privKey, inFile, outFile)
+		return
+	}
+
+	pubKey, err := openPubKey()
+	if err != nil {
+		panic(err)
+	}
+	gpgEncrypt(pubKey, inFile, outFile)
 
 }

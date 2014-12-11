@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"io"
-	"os"
 	"time"
 
 	"golang.org/x/crypto/openpgp"
@@ -14,31 +13,24 @@ import (
 	_ "golang.org/x/crypto/sha3"
 )
 
-//A fake static time for when keys are (were) created
+//A fake static time for when key's are (were) created
 var KeyDate time.Time = time.Date(1979, time.April, 10, 14, 15, 0, 0, time.FixedZone("VET", -16200))
 
-func gpgEncrypt(rsaPubKey *rsa.PublicKey) {
+var config = &packet.Config{
+	DefaultHash:   crypto.SHA3_512,
+	DefaultCipher: packet.CipherAES256,
+}
+
+func prompter(keys []openpgp.Key, symmetric bool) (passphrase []byte, err error) {
+	return
+}
+
+func gpgEncrypt(rsaPubKey *rsa.PublicKey, inFile io.Reader, outFile io.Writer) {
 
 	aesKey := make([]byte, packet.CipherAES256.KeySize())
 	rand.Read(aesKey)
 
 	pubKey := packet.NewRSAPublicKey(KeyDate, rsaPubKey)
-	config := &packet.Config{
-		DefaultHash:   crypto.SHA3_512,
-		DefaultCipher: packet.CipherAES256,
-	}
-
-	inFile, err := os.Open("plaintext-file")
-	if err != nil {
-		panic(err)
-	}
-	defer inFile.Close()
-
-	outFile, err := os.OpenFile("encrypted-file", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		panic(err)
-	}
-	defer outFile.Close()
 
 	outArmor, err := armor.Encode(outFile, "SSH-CRYPT-MESSAGE", make(map[string]string))
 	if err != nil {
@@ -79,29 +71,9 @@ func gpgEncrypt(rsaPubKey *rsa.PublicKey) {
 	// the decrypted result.
 }
 
-func prompter(keys []openpgp.Key, symmetric bool) (passphrase []byte, err error) {
-	return
-}
-
-func gpgDecrypt(rsaPrivKey *rsa.PrivateKey) {
+func gpgDecrypt(rsaPrivKey *rsa.PrivateKey, inFile io.Reader, outFile io.Writer) {
 
 	privKey := packet.NewRSAPrivateKey(KeyDate, rsaPrivKey)
-	config := &packet.Config{
-		DefaultHash:   crypto.SHA3_512,
-		DefaultCipher: packet.CipherAES256,
-	}
-
-	inFile, err := os.Open("encrypted-file")
-	if err != nil {
-		panic(err)
-	}
-	defer inFile.Close()
-
-	outFile, err := os.OpenFile("decrypted-file", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0600)
-	if err != nil {
-		panic(err)
-	}
-	defer outFile.Close()
 
 	armorBlock, err := armor.Decode(inFile)
 	if err != nil {
