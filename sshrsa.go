@@ -1,7 +1,3 @@
-// Copyright 2012 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package main
 
 import (
@@ -202,8 +198,8 @@ func ParsePrivateKey(pemBytes []byte) (key *rsa.PrivateKey, err error) {
 	}
 }
 
-func openPubKey() (out *rsa.PublicKey, err error) {
-	file, err := os.Open("/Users/shammas/.ssh/id_rsa.pub")
+func openPubKey(path string) (out *rsa.PublicKey, err error) {
+	file, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}
@@ -228,8 +224,8 @@ func openPubKey() (out *rsa.PublicKey, err error) {
 
 }
 
-func openPrivKey() (key *rsa.PrivateKey, err error) {
-	file, err := os.Open("/Users/shammas/.ssh/id_rsa")
+func openPrivKey(path string) (key *rsa.PrivateKey, err error) {
+	file, err := os.Open(path)
 	if err != nil {
 		panic(err)
 	}

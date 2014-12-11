@@ -52,7 +52,7 @@ func main() {
 	defer outFile.Close()
 
 	if doDecrypt {
-		privKey, err := openPrivKey()
+		privKey, err := openPrivKey(privKeyPath)
 		if err != nil {
 			panic(err)
 		}
@@ -60,7 +60,7 @@ func main() {
 		return
 	}
 
-	pubKey, err := openPubKey()
+	pubKey, err := openPubKey(pubKeyPath)
 	if err != nil {
 		panic(err)
 	}
