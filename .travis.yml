@@ -5,8 +5,19 @@ go:
  - 1.4
  - tip
 
+before_install:
+ - sed -i "s|git://github.com/totallylegitbiz/sshcrypt.git|https://github.com/totallylegitbiz/sshcrypt|g"
+
 install:
  - go get -u
  - go build
+
+script:
  - go test -short
 
+notifications:
+  email:
+    recipients:
+      - georgyo@gmail.com
+    on_success: change
+    on_failure: always
