@@ -65,7 +65,7 @@ That's what this tool hopes to solve.
 
 ## FAQ
 
-Q. Is this an orginal idea? </br>
+Q. Is this an orginal idea? <br/>
 A. No, but this is the first tool of its kind. AWS actually encrypts their window instance's password using sshkeys.
 
 
