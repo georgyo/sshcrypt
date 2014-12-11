@@ -1,23 +1,23 @@
 
-== SSHCRYPT ==
+## SSHCRYPT
 
 Encrypt and Decrypt files using only SSH RSA Keys!
 
 Planned Features
- 1. CLI arguments! - DONE
- 2. Encrypt to ALL RSA keys in an authorizedKeys file
- 3. Encrypt to ALL RSA keys in an user's github account
- 4. Releases
- 5. If private key has a password, ask for it securely
- 6. ssh-agent support?
+1. CLI arguments! - DONE
+2. Encrypt to ALL RSA keys in an authorizedKeys file
+3. Encrypt to ALL RSA keys in an user's github account
+4. Releases
+5. If private key has a password, ask for it securely
+6. ssh-agent support?
 
 Note.
- - Can only encrypt to one key at a time, will support many later
- - Does not yet supported password protected private keys
+- Can only encrypt to one key at a time, will support many later
+- Does not yet supported password protected private keys
 
 
-== INSTALL AND TEST ==
-
+## INSTALL AND TEST
+```sh
 $ go get -u github.com/totallylegitbiz/sshcrypt
 $ sshcrypt --help
 Usage of ./sshcrypt:
@@ -29,8 +29,9 @@ Usage of ./sshcrypt:
 
 $ echo hello | sshcrypt | sshcrypt -d
 hello
+```
 
-== Why? ==
+## Why?
 
 The other day, my friend was asking how to encrypt a file public key. I assumed he
 meant PGP key, but he was actually talking about ssh keys. A quick google shows
@@ -62,7 +63,7 @@ Why someone hasn't made a simple tool to use those keys to send someone is a mys
 That's what this tool hopes to solve.
 
 
-== FAQ ==
+## FAQ
 
 Q. Is this an orginal idea? </br>
 A. No, but this is the first tool of its kind. AWS actually encrypts their window instance's password using sshkeys.
