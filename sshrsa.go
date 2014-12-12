@@ -13,6 +13,8 @@ import (
 	"math/big"
 	"os"
 
+	"github.com/totallylegitbiz/sshcrypt/gopass"
+
 	"golang.org/x/crypto/ssh"
 )
 
@@ -193,6 +195,17 @@ func ParsePrivateKey(pemBytes []byte) (key *rsa.PrivateKey, err error) {
 
 	switch block.Type {
 	case "RSA PRIVATE KEY":
+		if procType, ok := block.Headers["Proc-Type"]; ok && procType == "4,ENCRYPTED" {
+			keyPass, err := gopass.GetPass("Password: ")
+			if err != nil {
+				panic(err)
+			}
+			decryptedPemBtyes, err := x509.DecryptPEMBlock(block, []byte(keyPass))
+			if err != nil {
+				panic(err)
+			}
+			return x509.ParsePKCS1PrivateKey(decryptedPemBtyes)
+		}
 		return x509.ParsePKCS1PrivateKey(block.Bytes)
 	default:
 		return nil, fmt.Errorf("ssh: unsupported key type %q", block.Type)
