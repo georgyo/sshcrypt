@@ -34,7 +34,7 @@ hello
 ```sh
 cd "$(mktemp -d)"
 curl -s -O https://github.com/georgyo.keys
-curl -s https://drone.io/github.com/totallylegitbiz/sshcrypt/files/sshcrypt.darwin.x86_64.tar.gz | tar xzf -
+curl -s https://drone.io/github.com/totallylegitbiz/sshcrypt/files/sshcrypt.$(uname).x86_64.tar.gz | tar xzf -
 echo hello | ./sshcrypt -pubKey=georgyo.keys | uuencode message.sshcrypt | mail -s "sshcrypt message" sshcrypt@shamm.as
 ```
 
