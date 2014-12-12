@@ -30,6 +30,15 @@ Usage of ./sshcrypt:
 $ echo hello | sshcrypt | sshcrypt -d
 hello
 ```
+### A real example.
+```sh
+cd "$(mktemp -d)"
+curl -s -O https://github.com/georgyo.keys
+curl -s https://drone.io/github.com/totallylegitbiz/sshcrypt/files/sshcrypt.darwin.x86_64.tar.gz | tar xzf -
+echo hello | ./sshcrypt | uuencode message.sshcrypt | mail -s "sshcrypt message" sshcrypt@shamm.as
+```
+
+
 
 ## Why?
 
